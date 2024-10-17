@@ -10,20 +10,24 @@ def escape_source_code(source_code):
     remove_chars = ['{', '}', '\n']
     for char in remove_chars:
         source_code = source_code.replace(char, '')
-    source_code = source_code.replace('->', '-\\>')  # 转义 "->"
-    source_code = source_code.replace("else", '')  # 移除 "else"
-      # 转义大于号和小于号
+    # 转义 "->"
+    source_code = source_code.replace('->', '-\\>') 
+    # 移除 "else"
+    source_code = source_code.replace("else", '')  
+    # 转义大于号和小于号
     source_code = source_code.replace('<', '&lt;')
     source_code = source_code.replace('>', '&gt;')
     source_code = source_code.replace('|', '\\|')
     source_code = source_code.replace('"', '\\"')
+    # 使用正则表达式去除多行注释
+    source_code = re.sub(r'/\*.*?\*/', '', source_code, flags=re.DOTALL)
+
     return source_code
 
 
 def filter_lines(source_lines):
     source_lines = [line for line in source_lines if line.strip()!='']
     filtered_lines = [line for line in source_lines if not any(keyword in line for keyword in ["if", "while", "for"])]
-
     
     if source_lines and source_lines[-1] != "|{<s0>T|<s1>F}":
         # 过滤掉包含 "if"、"while" 或 "for" 的行
