@@ -22,7 +22,7 @@ Python 3.10.12
 ```
 sudo apt-get update
 sudo apt-get install llvm clang
-pip install -r requirements.txt
+pip install graphviz
 ```
 
 对应版本：
@@ -30,7 +30,7 @@ pip install -r requirements.txt
 ```
 Ubuntu clang version 14.0.0-1ubuntu1.1
 Ubuntu LLVM version 14.0.0
-pydot==3.0.1
+graphviz version 2.43.0 (0)
 ```
 
 
