@@ -10,14 +10,11 @@ def escape_source_code(source_code):
     remove_chars = ['{', '}', '\n']
     for char in remove_chars:
         source_code = source_code.replace(char, '')
-    # 转义 "->"
-    source_code = source_code.replace('->', '-\\>') 
     # 移除 "else"
     source_code = source_code.replace("else", '')  
     # 转义大于号和小于号
     source_code = source_code.replace('<', '&lt;')
     source_code = source_code.replace('>', '&gt;')
-    source_code = source_code.replace('|', '\\|')
     source_code = source_code.replace('"', '\\"')
     # 使用正则表达式去除多行注释
     source_code = re.sub(r'/\*.*?\*/', '', source_code, flags=re.DOTALL)

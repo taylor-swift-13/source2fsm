@@ -66,8 +66,8 @@ def main():
     os.makedirs(output_folder, exist_ok=True)
 
     # 构建文件路径
-    final_file_path = os.path.join(output_folder, f".{file_name.split('.', 1)[0]}.dot")
-    png_file_path = os.path.join(output_folder, f"{file_name.split('.', 1)[0]}.png")
+    final_file_path = os.path.join(output_folder, f".{file_name.split('.', 1)[0]}_{function_name}.dot")
+    png_file_path = os.path.join(output_folder, f"{file_name.split('.', 1)[0]}_{function_name}.png")
 
 
     # 使用 subprocess 运行 clang 命令

@@ -1,8 +1,0 @@
-digraph "FSM for 'main' function" {
-Node0x511891 [shape=circle, color="#3d50c3ff", style=filled, fillcolor="#ADD8E6", label=state1, xlabel="for(unint32 i=0;i&lt;10;i++)", fixedsize=true, width=1.5, height=1.5];
-Node0x511a10 [shape=record, color="#3d50c3ff", style=filled, fillcolor="#f59c7d70", label="{i++;}"];
-Node0x511a60 [shape=record, color="#3d50c3ff", style=filled, fillcolor="#f59c7d70", label="{return 0;}"];
-Node0x511a10 -> Node0x511891;
-Node0x511891 -> Node0x511a10 [color="#00ff00"];
-Node0x511891 -> Node0x511a60 [color="#ff0000"];
-}

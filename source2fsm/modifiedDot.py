@@ -1,6 +1,15 @@
-import pydot
+import pydot 
 import os
 import re
+import html
+
+def unescape_label(source_code):
+    source_code = source_code.replace('\\"', '"')
+    source_code = source_code.replace('\\|', '|')
+    source_code = source_code.replace('&gt;', '>')
+    source_code = source_code.replace('&lt;', '<')
+    return source_code
+    
 
 def render_dot(dot_file):
     # 读取dot文件
@@ -31,17 +40,21 @@ def render_dot(dot_file):
                 state_counter += 1
 
                 # 移除 "|{<s0>T|<s1>F}" 和标签中的首尾花括号{}
-                label = label.replace('|{<s0>T|<s1>F}', '').replace('{','').replace('}','').replace('\l','')
+                label = label.replace('|{<s0>T|<s1>F}', '').replace('{','').replace('}','').replace('\l','').strip('"')
 
                 # 设置新的状态名为节点的 label 和 xlabel
                 node.set("label", new_state_name)
-                node.set("xlabel", label)
+                label =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="lightblue" ALIGN="center">{label}</TD></TR></TABLE>>'
+                
+                node.set("xlabel",label)
+              
+                
 
                 # 修改节点形状为圆形，大小，颜色
                 node.set_shape("circle")
                 node.set_fixedsize("true")
-                node.set_width(1.5)
-                node.set_height(1.5)
+                node.set_width(1.3)
+                node.set_height(1.3)
                 node.set_style("filled")
                 node.set_fillcolor("#ADD8E6")  # 浅蓝色背景
 
@@ -52,26 +65,34 @@ def render_dot(dot_file):
                     new_state_name = f"state{state_counter}"
                     state_counter += 1
 
-                   # 提取所有分支的标签和 case 值，只匹配分支格式如 <s0>T
-                    branches = re.findall(r'<s(\d+)>([^|}]+)', label) 
+                    # 提取所有分支的标签和 case 值，只匹配分支格式如 <s0>T
+                    branches = re.findall(r'<s(\d+)>([^|}]+)', label)              
 
+                    # 移除所有分支的标签部分
+                    label_cleaned = re.sub(cond_pattern, '', label).replace('{', '').replace('}', '').replace('\l', '').strip('"')       
+                    switch_key = re.search(r'\(\s*(.*?)\s*\)', label_cleaned).group(1)
+
+
+                    # 分支的 case 加入 cond
+                    branches = [(key, f'{switch_key} : {value}') for key, value in branches]
 
                     # 将节点名和分支存入字典
                     node_branches_map[node_name] = branches
-
-                    # 移除所有分支的标签部分
-                    label_cleaned = re.sub(cond_pattern, '', label).replace('{', '').replace('}', '').replace('\l', '')
+                   
 
                     
                     # 设置新的状态名为节点的 label 和 xlabel
                     node.set("label", new_state_name)
+                    label_cleaned =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="lightblue" ALIGN="center">{label_cleaned}</TD></TR></TABLE>>'
+                
                     node.set("xlabel", label_cleaned)
+                    
 
                     # 修改节点形状为圆形，大小，颜色
                     node.set_shape("circle")
                     node.set_fixedsize("true")
-                    node.set_width(1.5)
-                    node.set_height(1.5)
+                    node.set_width(1.3)
+                    node.set_height(1.3)
                     node.set_style("filled")
                     node.set_fillcolor("#ADD8E6")  # 浅蓝色背景
 
@@ -92,7 +113,8 @@ def render_dot(dot_file):
                 for branch_num, case_value in branches:
                     if f":s{branch_num}" in source:
                         source_clean = source.replace(f":s{branch_num}", "")
-                        # 检查边是否已存在
+                        # 检查边是否已存在 
+                        case_value = f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="grey" ALIGN="center">{case_value}</TD></TR></TABLE>>'
                         new_edge = pydot.Edge(source_clean, destination, label=case_value)   
                         edges_to_add.append(new_edge)
                         edges_to_remove.append(edge)
