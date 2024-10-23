@@ -1,0 +1,18 @@
+digraph "FSM for 'PseudoRateFun' function" {
+Node0x8fc620 [shape=record, color=transparent, style=filled, fillcolor="#F79e5e", label="{PseudoRate *pIp = (PseudoRate*)p;}"];
+Node0x8fca11 [shape=circle, color=transparent, style=filled, fillcolor="#FFCC00", label=state1, xlabel=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="#FFCC00" ALIGN="center">for (i = 0;i &lt;3;i++)</TD></TR></TABLE>>, fixedsize=true, width=1.3, height=1.3];
+Node0x8fc7c1 [shape=circle, color=transparent, style=filled, fillcolor="#ADD8E6", label=state2, xlabel=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="#ADD8E6" ALIGN="center">if ((pIp-&gt;pu[i] - pIp-&gt;r[i])&gt;pIp-&gt;h1[i])</TD></TR></TABLE>>, fixedsize=true, width=1.3, height=1.3];
+Node0x8fd890 [shape=record, color=transparent, style=filled, fillcolor="#F79e5e", label="{pIp-&gt;Yp[i] = 0x0;\lpIp-&gt;Yn[i] = 0xF;\lpIp-&gt;r[i] = 0.9231f * pIp-&gt;r[i] + 0.07688f;}"];
+Node0x8fd8e1 [shape=circle, color=transparent, style=filled, fillcolor="#ADD8E6", label=state3, xlabel=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="#ADD8E6" ALIGN="center">if ((pIp-&gt;pu[i] - pIp-&gt;r[i])&lt;-pIp-&gt;h1[i])</TD></TR></TABLE>>, fixedsize=true, width=1.3, height=1.3];
+Node0x900660 [shape=record, color=transparent, style=filled, fillcolor="#F79e5e", label="{pIp-&gt;Yp[i] = 0xF;\lpIp-&gt;Yn[i] = 0x0;\lpIp-&gt;r[i] = 0.9231f * pIp-&gt;r[i] - 0.07688f;}"];
+Node0x9006b0 [shape=record, color=transparent, style=filled, fillcolor="#F79e5e", label="{pIp-&gt;Yp[i] = 0x0;\lpIp-&gt;Yn[i] = 0x0;\lpIp-&gt;r[i] = 0.9231f * pIp-&gt;r[i];}"];
+Node0x8fc620 -> Node0x8fca11 [penwidth=3, color="#555555"];
+Node0x8fd890 -> Node0x8fca11 [penwidth=3, color="#555555"];
+Node0x900660 -> Node0x8fca11 [penwidth=3, color="#555555"];
+Node0x9006b0 -> Node0x8fca11 [penwidth=3, color="#555555"];
+Node0x8fca11 -> Node0x8fc7c1 [color="#4CD964", penwidth=3];
+Node0x8fc7c1 -> Node0x8fd890 [color="#4CD964", penwidth=3];
+Node0x8fc7c1 -> Node0x8fd8e1 [color="#FF3B30", penwidth=3];
+Node0x8fd8e1 -> Node0x900660 [color="#4CD964", penwidth=3];
+Node0x8fd8e1 -> Node0x9006b0 [color="#FF3B30", penwidth=3];
+}

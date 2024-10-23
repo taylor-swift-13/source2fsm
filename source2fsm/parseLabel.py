@@ -23,10 +23,18 @@ def escape_source_code(source_code):
 
     return source_code
 
+def if_condition(source_line):
+    
+    if 'if' in source_line and '(' in source_line and source_line.split('(')[0].strip()[-1]== 'f':
+        return True
+    elif 'for'  in source_line and  '(' in source_line and source_line.split('(')[0].strip()[-1]== 'r':
+        return True
+    elif 'while'  in source_line and  '(' in source_line and source_line.split('(')[0].strip()[-1]== 'e':
+        return True
 
 def filter_lines(source_lines):
     source_lines = [line for line in source_lines if line.strip()!='']
-    filtered_lines = [line for line in source_lines if not any(keyword in line for keyword in ["if", "while", "for"])]
+    filtered_lines = [line for line in source_lines if not if_condition(line)]
     
     if source_lines and source_lines[-1] != "|{<s0>T|<s1>F}":
         # 过滤掉包含 "if"、"while" 或 "for" 的行

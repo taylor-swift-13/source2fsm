@@ -1,6 +1,17 @@
 import pydot 
 import os
 import re
+from enum import Enum
+
+class Color(Enum):
+    DARK_GRAY = '#555555'
+    LIGHT_GRAY = '#D3D3D3'
+    RED = '#FF3B30'
+    GREEN = '#4CD964'
+    LIGHT_BLUE = '#ADD8E6'
+    LIGHT_ORANGE ='#F79e5e'
+    YELLOW ='#FFCC00'
+
 
 def undepulicate_label(label):
     segments = label.split(')')
@@ -48,6 +59,8 @@ def render_dot(dot_file):
 
         if label :
             if '|{<s0>T|<s1>F}' in label:
+
+
                 # 生成递增的状态名，例如 state1, state2, state3 ...
                 new_state_name = f"state{state_counter}"
                 state_counter += 1
@@ -58,19 +71,29 @@ def render_dot(dot_file):
 
                 # 设置新的状态名为节点的 label 和 xlabel
                 node.set("label", new_state_name)
-                label =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="lightblue" ALIGN="center">{label}</TD></TR></TABLE>>'
+                if "while" in label or "for" in label:
+                    label =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="{Color.YELLOW.value}" ALIGN="center">{label}</TD></TR></TABLE>>'
+                else:
+                    label =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="{Color.LIGHT_BLUE.value}" ALIGN="center">{label}</TD></TR></TABLE>>'
+
                 
                 node.set("xlabel",label)
               
                 
 
-                # 修改节点形状为圆形，大小，颜色
+                # # 修改节点形状为圆形，大小，颜色
                 node.set_shape("circle")
                 node.set_fixedsize("true")
                 node.set_width(1.3)
                 node.set_height(1.3)
                 node.set_style("filled")
-                node.set_fillcolor("#ADD8E6")  # 浅蓝色背景
+                if "while" in label or "for" in label:
+                    node.set_fillcolor(Color.YELLOW.value) 
+                else:
+                    node.set_fillcolor(Color.LIGHT_BLUE.value)  # 浅蓝色背景
+                node.set_color("transparent")
+             
+
 
             elif match:
                     
@@ -97,7 +120,7 @@ def render_dot(dot_file):
                     
                     # 设置新的状态名为节点的 label 和 xlabel
                     node.set("label", new_state_name)
-                    label_cleaned =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="lightblue" ALIGN="center">{label_cleaned}</TD></TR></TABLE>>'
+                    label_cleaned =  f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="{Color.LIGHT_GRAY.value}" ALIGN="center">{label_cleaned}</TD></TR></TABLE>>'
                 
                     node.set("xlabel", label_cleaned)
                     
@@ -108,7 +131,14 @@ def render_dot(dot_file):
                     node.set_width(1.3)
                     node.set_height(1.3)
                     node.set_style("filled")
-                    node.set_fillcolor("#ADD8E6")  # 浅蓝色背景
+                    node.set_fillcolor(Color.LIGHT_GRAY.value) 
+                    node.set_color("transparent") 
+
+            
+            else:
+                    node.set_color("transparent") 
+                    node.set_fillcolor(Color.LIGHT_ORANGE.value) 
+
 
  # 遍历所有边
     edges_to_add = []
@@ -127,7 +157,7 @@ def render_dot(dot_file):
                 if f":s{branch_num}" in source:
                     source_clean = source.replace(f":s{branch_num}", "")
                     # 检查边是否已存在 
-                    case_value = f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="grey" ALIGN="center">{case_value}</TD></TR></TABLE>>'
+                    case_value = f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="{Color.LIGHT_GRAY.value}" ALIGN="center">{case_value}</TD></TR></TABLE>>'
                     new_edge = pydot.Edge(source_clean, destination, label=case_value)   
                     edges_to_add.append(new_edge)
                     edges_to_remove.append(edge)
@@ -138,10 +168,10 @@ def render_dot(dot_file):
             new_edge = None
             if ':s0' in source:
                 # 修改边为绿色，并移除 :s0
-                new_edge = pydot.Edge(source.replace(":s0", ""), destination, color="#00ff00")
+                new_edge = pydot.Edge(source.replace(":s0", ""), destination, color=Color.GREEN.value)
             elif ':s1' in source:
                 # 修改边为红色，并移除 :s1
-                new_edge = pydot.Edge(source.replace(":s1", ""), destination, color="#ff0000")
+                new_edge = pydot.Edge(source.replace(":s1", ""), destination, color=Color.RED.value)
             if new_edge:
                 # 记录要添加和移除的边
                 edges_to_add.append(new_edge)
@@ -155,6 +185,9 @@ def render_dot(dot_file):
     
     for new_edge in edges_to_add:
         graph.add_edge(new_edge)
+
+    
+
 
 
     # 写入修改后的dot文件
@@ -259,12 +292,14 @@ def delete_dot(dot_file):
         
         node.set("label",label)
   
-  
+    for edge in graph.get_edges():
+        edge.set_penwidth(3)  # 设置边的粗细为2
+        if edge.get_color() == None:
+            edge.set_color(Color.DARK_GRAY.value)  # 将黑色改为深灰色
 
     # 写入修改后的 dot 文件
     modified_dot_file = '.final.dot'
     graph.write(modified_dot_file)
-
 
 
 def modify_dot(dot_file):

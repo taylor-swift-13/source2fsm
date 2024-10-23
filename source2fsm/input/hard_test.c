@@ -10,7 +10,12 @@ int main(){
  int c = 3;
 
  scanf("%d", &c);
- 
+
+
+  while(a>b){
+   a++;
+ }
+
  int * p=(int*)malloc(sizeof(int));
 
  if(a>b&&b>c){
@@ -26,6 +31,7 @@ int main(){
    a++;
  }
 
+
  if(a>b){
    a++;
    a++;
@@ -35,6 +41,7 @@ int main(){
    b++;
    a++;
  }
+ a++;
 
  switch (a)
     {
