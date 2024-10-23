@@ -3,6 +3,9 @@ import re
 def map_ir_to_source(ir_content, source_code_content):
     # 将源代码按行分割
     source_lines = source_code_content.splitlines()
+    source_lines = remove_useless_char(source_lines)
+    source_lines = alter_condition(source_lines)
+    source_lines = alter_duplicate(source_lines)
 
     # 匹配IR中带有调试信息(!dbg)的指令
     ir_instruction_pattern = re.compile(r'^\s*([^;]+)\s*,\s*!dbg\s*!([0-9]+)')
@@ -34,6 +37,7 @@ def map_ir_to_source(ir_content, source_code_content):
                     # 将IR指令与源码行进行映射
                     ir_to_source_mapping[ir_instruction] = source_lines[source_line_number - 1]  # 源码行数从1开始
 
+
     return ir_to_source_mapping
 
 
@@ -46,3 +50,88 @@ def parse_source_code(source_file_path):
     """Reads the source code file and returns its lines."""
     with open(source_file_path, 'r') as file:
         return file.readlines()
+
+# 去重
+def alter_duplicate(lines):
+    update_lines =[]
+
+    for current_line in lines:
+        if current_line == "":
+            update_lines.append(current_line)
+            continue
+
+        for compare_line in update_lines:
+
+            if current_line==compare_line:
+                current_line = compare_line[:-1]+' '+compare_line[-1]
+            
+        update_lines.append(current_line)
+        
+       
+    return update_lines
+
+# 去重判断语句
+def alter_condition(lines):
+    compare_line = None
+    update_lines =[]
+    if_lines=[]
+    for_lines=[]
+    switch_lines=[]
+    while_lines=[]
+
+
+    for current_line in lines:
+        current_line = current_line.strip()  
+
+        if current_line == "":
+            update_lines.append(current_line)
+            continue
+
+        if 'if' in current_line:
+            for compare_line in if_lines:
+                if current_line==compare_line:
+                    current_line = compare_line[:-1]+' '+compare_line[-1]
+
+            if_lines.append(current_line)
+            update_lines.append(current_line)
+        
+        elif 'while' in current_line:
+            for compare_line in while_lines:
+                if current_line==compare_line:
+                    current_line = compare_line[:-1]+' '+compare_line[-1]
+
+            while_lines.append(current_line)
+            update_lines.append(current_line)
+        
+        elif 'switch' in current_line:
+            for compare_line in switch_lines:
+                if current_line==compare_line:
+                    current_line = compare_line[:-1]+' '+compare_line[-1]
+
+            switch_lines.append(current_line)
+            update_lines.append(current_line)
+
+        elif 'for' in current_line:
+            for compare_line in for_lines:
+                if current_line==compare_line:
+                    current_line = compare_line[:-1]+' '+compare_line[-1]
+
+            for_lines.append(current_line)
+            update_lines.append(current_line)
+        else:
+            update_lines.append(current_line)
+
+
+    return update_lines
+
+#去除 { } \n        
+def remove_useless_char(lines): 
+    updated_lines=[]          
+    remove_chars = ['{', '}', '\n']
+    for line in lines:
+        for char in remove_chars:
+            line = line.replace(char, '')
+        updated_lines.append(line)
+    return updated_lines
+
+            

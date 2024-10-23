@@ -1,5 +1,7 @@
 import re
 
+
+
 # 确保标签内容用大括号包裹
 def ensure_brackets(updated_label_content):
     updated_label_content = '{' + updated_label_content + '}'
@@ -7,17 +9,17 @@ def ensure_brackets(updated_label_content):
 
 # 转义源代码
 def escape_source_code(source_code):
-    remove_chars = ['{', '}', '\n']
-    for char in remove_chars:
-        source_code = source_code.replace(char, '')
     # 移除 "else"
     source_code = source_code.replace("else", '')  
     # 转义大于号和小于号
+    source_code = source_code.replace('&'  ,'&amp;')
     source_code = source_code.replace('<', '&lt;')
     source_code = source_code.replace('>', '&gt;')
     source_code = source_code.replace('"', '\\"')
+    
     # 使用正则表达式去除多行注释
     source_code = re.sub(r'/\*.*?\*/', '', source_code, flags=re.DOTALL)
+    source_code = re.sub(r'//.*?', '', source_code, flags=re.DOTALL)
 
     return source_code
 
@@ -35,28 +37,46 @@ def filter_lines(source_lines):
 # 解析label，去重并处理映射
 def parse_label(label_content, ir_to_source_mapping):
     # 去掉首尾的字符
+    
     if label_content[0]=='{'and label_content[-1]=='}':
         label_content = label_content.strip()[1:-1]
 
     ir_lines = label_content.split('\\l')
     source_lines = []
     seen_lines = set()  # 用于去重
-
+    last_ir_line = None
     for ir_line in ir_lines:
+
+        #%5 = call i32 (i8*, ...) @printf(i8* noundef getelementptr inbounds ([6 x i8], [6 x i8]* @.str, i64 0, i64 0))
         ir_line = ir_line.strip()
-        if ir_line in ir_to_source_mapping:
+
+        if last_ir_line and'...' in last_ir_line and '...' in ir_line :
+            ir_line = ir_line.replace('...','')
+            new_line =last_ir_line+ir_line
+            new_line =new_line.strip()
+            if new_line in ir_to_source_mapping:
+                source_code = ir_to_source_mapping[new_line]
+                escaped_code = escape_source_code(source_code)
+                if escaped_code not in seen_lines:
+                    source_lines.append(escaped_code)
+                    seen_lines.add(escaped_code) 
+                
+        elif ir_line in ir_to_source_mapping:
             source_code = ir_to_source_mapping[ir_line]
             escaped_code = escape_source_code(source_code)
             if escaped_code not in seen_lines:
                 source_lines.append(escaped_code)
-                seen_lines.add(escaped_code)
+                seen_lines.add(escaped_code) 
         else:
             if ir_line not in seen_lines and ir_line:
                 if not ('%' in ir_line or ir_line.startswith('...') or ir_line[0].isdigit()):
                     source_lines.append(ir_line)
                     seen_lines.add(ir_line)
 
+        last_ir_line=ir_line
+
     source_lines = filter_lines(source_lines)
+
 
     updated_label_content = '\\l'.join(source_lines)
     #检查 updated_label_content 中 if 语句 后有没有 |
@@ -202,7 +222,6 @@ def parse_dot_file(dot_file_path, ir_to_source_mapping):
             unique_lines.append(line)
 
     updated_lines=unique_lines
-
     
 
     return updated_lines

@@ -1,14 +1,25 @@
 import pydot 
 import os
 import re
-import html
 
-def unescape_label(source_code):
-    source_code = source_code.replace('\\"', '"')
-    source_code = source_code.replace('\\|', '|')
-    source_code = source_code.replace('&gt;', '>')
-    source_code = source_code.replace('&lt;', '<')
-    return source_code
+def undepulicate_label(label):
+    segments = label.split(')')
+    
+    # 对每一部分进行操作，例如将每段转换为大写
+    processed_segments = [segment.strip()  for segment in segments]
+
+    label = ')'.join(processed_segments)
+
+    segments = label.split(';')
+
+    # 对每一部分进行操作，例如将每段转换为大写
+    processed_segments = [segment.strip()  for segment in segments]
+
+    label = ';'.join(processed_segments)
+    
+    return label
+
+
     
 
 def render_dot(dot_file):
@@ -27,11 +38,13 @@ def render_dot(dot_file):
     # 字典用于存储节点名及其对应的分支
     node_branches_map = {}
 
+
     # 遍历所有节点
     for node in graph.get_nodes():
         label = node.get("label")
         node_name = node.get_name()
         match = re.search(cond_pattern, label)
+        
 
         if label :
             if '|{<s0>T|<s1>F}' in label:
@@ -41,6 +54,7 @@ def render_dot(dot_file):
 
                 # 移除 "|{<s0>T|<s1>F}" 和标签中的首尾花括号{}
                 label = label.replace('|{<s0>T|<s1>F}', '').replace('{','').replace('}','').replace('\l','').strip('"')
+                
 
                 # 设置新的状态名为节点的 label 和 xlabel
                 node.set("label", new_state_name)
@@ -103,22 +117,23 @@ def render_dot(dot_file):
     for edge in graph.get_edges():
         source = edge.get_source()
         destination = edge.get_destination()
+        source_name = source.split(':')[0]
 
         
 
-        if switch_flag:
-            source_name = source.split(':')[0]
-            if source_name in  node_branches_map:
-                branches = node_branches_map[source_name]
-                for branch_num, case_value in branches:
-                    if f":s{branch_num}" in source:
-                        source_clean = source.replace(f":s{branch_num}", "")
-                        # 检查边是否已存在 
-                        case_value = f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="grey" ALIGN="center">{case_value}</TD></TR></TABLE>>'
-                        new_edge = pydot.Edge(source_clean, destination, label=case_value)   
-                        edges_to_add.append(new_edge)
-                        edges_to_remove.append(edge)
-                        break
+        if switch_flag and source_name in  node_branches_map:
+            branches = node_branches_map[source_name]
+            for branch_num, case_value in branches:
+                if f":s{branch_num}" in source:
+                    source_clean = source.replace(f":s{branch_num}", "")
+                    # 检查边是否已存在 
+                    case_value = f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="grey" ALIGN="center">{case_value}</TD></TR></TABLE>>'
+                    new_edge = pydot.Edge(source_clean, destination, label=case_value)   
+                    edges_to_add.append(new_edge)
+                    edges_to_remove.append(edge)
+                    break
+        
+
         else :     
             new_edge = None
             if ':s0' in source:
@@ -140,6 +155,7 @@ def render_dot(dot_file):
     
     for new_edge in edges_to_add:
         graph.add_edge(new_edge)
+
 
     # 写入修改后的dot文件
     modified_dot_file = '.rendered_' + dot_file
@@ -219,6 +235,32 @@ def delete_dot(dot_file):
             node.set("label", new_state_name)
             state_counter += 1
 
+    
+    # 获取图中的所有节点名称
+    defined_nodes = {node.get_name() for node in graph.get_nodes()}
+   
+    # 添加有效边到新图中，删除指向未定义节点的边
+    for edge in graph.get_edges():
+        source = edge.get_source()
+        target = edge.get_destination()
+        # 仅保留目标节点在定义节点集合中的边
+        if target not in defined_nodes:
+            graph.del_edge(source,target)
+    
+     
+    for node in graph.get_nodes():
+        label = node.get("label")
+        xlabel = node.get("xlabel")
+        label = undepulicate_label(label)
+
+        if xlabel!=None: 
+            xlabel = undepulicate_label(xlabel)
+            node.set("xlabel",xlabel)
+        
+        node.set("label",label)
+  
+  
+
     # 写入修改后的 dot 文件
     modified_dot_file = '.final.dot'
     graph.write(modified_dot_file)
@@ -231,6 +273,8 @@ def modify_dot(dot_file):
      # 写入修改后的dot文件
     
     delete_dot(rendered_dot_file)
+
+    
     if os.path.exists(rendered_dot_file):
         os.remove(rendered_dot_file)  # 删除文件
 
