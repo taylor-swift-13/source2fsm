@@ -11,8 +11,9 @@ int main(){
 
  scanf("%d", &c);
 
+ if(a>b)a++;
 
-  while(a>b){
+while(a>b){
    a++;
  }
 

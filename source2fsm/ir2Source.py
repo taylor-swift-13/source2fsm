@@ -70,6 +70,29 @@ def alter_duplicate(lines):
        
     return update_lines
 
+
+def split_condition(lines):
+    updated_lines=[]
+    for line in lines:
+        if 'if' in line and '(' in line and line.split('(')[0].strip()[-1]== 'f':
+            if(line.split(')')[1].strip()!=''):
+                updated_lines.append(line.split(')')[0]+')')
+                updated_lines.append(line.split(')')[1])
+           
+        elif 'for'  in line and  '(' in line and line.split('(')[0].strip()[-1]== 'r':
+            if(line.split(')')[1].strip()!=''):
+                updated_lines.append(line.split(')')[0]+')')
+                updated_lines.append(line.split(')')[1])
+            
+        elif 'while'  in line and  '(' in line and line.split('(')[0].strip()[-1]== 'e':
+            if(line.split(')')[1].strip()!=''):
+                updated_lines.append(line.split(')')[0]+')')
+                updated_lines.append(line.split(')')[1])
+        else :
+            updated_lines.append(line)
+
+    return updated_lines
+
 # 去重判断语句
 def alter_condition(lines):
     compare_line = None

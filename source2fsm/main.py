@@ -5,9 +5,10 @@ import glob
 from ir2Source import map_ir_to_source
 from parseLabel import parse_dot_file
 from divideLabel import divide_label
-from modifiedDot import modify_dot
+from modifyDot import modify_dot
 # from preProcess import pre_process
 from preProcess import pre_process_
+from modifySource import modify_statements
 
 def read_file(file_path):
     """Reads the content of a file and returns it as a string."""
@@ -50,6 +51,10 @@ def main():
     #print(file_path)
     function_name =args.function_name
 
+    modify_statements(file_path)
+
+    file_path_ = f"{file_path.split('.')[0]}_modified.c"
+
     # 输出参数
     print("File name:", args.file_name)
     print("Function name:", args.function_name)
@@ -71,15 +76,14 @@ def main():
 
 
     # 使用 subprocess 运行 clang 命令
-    command_1 = ["clang", "-S", "-emit-llvm", file_path, "-o", ir_file_path ]
+    command_1 = ["clang", "-S", "-emit-llvm", file_path_, "-o", ir_file_path ]
 
     # 使用 subprocess 运行 clang 命令
-    command_2 = ["clang", "-O0", "-g", "-S", "-emit-llvm", file_path, "-o", 'updated.ll']
+    command_2 = ["clang", "-O0", "-g", "-S", "-emit-llvm", file_path_, "-o", 'updated.ll']
 
     
     command_3 = ["opt","-dot-cfg", "-disable-output","-enable-new-pm=0",ir_file_path ]
 
-    
     # 执行命令
     try:
         subprocess.run(command_1, check=True)
@@ -103,7 +107,7 @@ def main():
 
 
     ir_content = read_file("updated.ll")
-    source_code_content = read_file(file_path)
+    source_code_content = read_file(file_path_)
     ir_to_source_mapping = map_ir_to_source(ir_content, source_code_content)
 
     # 解析.dot文件并更新label内容
@@ -143,6 +147,8 @@ def main():
     # 删除每个 .dot 文件
     for ll_file in ll_files:
         os.remove(ll_file)
+
+    os.remove(file_path_)
     
 
 if __name__ == "__main__":
