@@ -1,8 +1,0 @@
-digraph "FSM for 'main' function" {
-Node0x192e8a1 [shape=circle, color=transparent, style=filled, fillcolor="#FFCC00", label=state1, xlabel=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD BGCOLOR="#FFCC00" ALIGN="center">for(unint32 i=0;i&lt;10;i++)</TD></TR></TABLE>>, fixedsize=true, width=1.3, height=1.3];
-Node0x192ea20 [shape=record, color=transparent, style=filled, fillcolor="#F79e5e", label="{i++;}"];
-Node0x192ea70 [shape=record, color=transparent, style=filled, fillcolor="#F79e5e", label="{return 0;}"];
-Node0x192ea20 -> Node0x192e8a1 [penwidth=3, color="#555555"];
-Node0x192e8a1 -> Node0x192ea20 [color="#4CD964", penwidth=3];
-Node0x192e8a1 -> Node0x192ea70 [color="#FF3B30", penwidth=3];
-}

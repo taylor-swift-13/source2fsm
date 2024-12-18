@@ -54,6 +54,7 @@ def main():
     modify_statements(file_path)
 
     file_path_ = f"{file_path.split('.')[0]}_modified.c"
+    #file_path_ = file_path
 
     # 输出参数
     print("File name:", args.file_name)
