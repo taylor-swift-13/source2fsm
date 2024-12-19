@@ -6,8 +6,8 @@ import subprocess
 
 app = Flask(__name__)
 
-download_url = "http://43.138.100.3:8877/api/file/downloadFile"
-upload_url = "http://43.138.100.3:8877/api/file/uploadFile"
+download_url = ""
+upload_url = ""
 
 def get_first_function_name(c_code):
     # 正则表达式，匹配C语言函数定义（包括返回类型和函数名）

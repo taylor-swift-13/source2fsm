@@ -23,6 +23,7 @@ Python 3.10.12
 sudo apt-get update
 sudo apt-get install llvm clang
 pip install graphviz
+pip install flask
 ```
 
 对应版本：
@@ -31,12 +32,13 @@ pip install graphviz
 Ubuntu clang version 14.0.0-1ubuntu1.1
 Ubuntu LLVM version 14.0.0
 graphviz version 2.43.0 (0)
+Flask 3.1.0
 ```
 
 
 ## 使用
 
-把 file.c 以及所依赖的 .h 文件都放到 input文件夹下，运行：
+把 file.c 以及所依赖的 .h 文件都放到 input 文件夹下，运行：
 
 ```
 python3 main.py file.c function
@@ -45,3 +47,11 @@ python3 main.py file.c function
 输入：文件名 file.c 和函数名 function。
 
 输出：对应函数的 fsm，在 output 文件夹中，包含 .dot 和 .png。
+
+## Docker 
+
+```
+docker build -t source2fsm-app .
+docker run -p 5000:5000 source2fsm-app
+```
+
