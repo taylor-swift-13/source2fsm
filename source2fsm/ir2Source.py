@@ -1,6 +1,11 @@
 import re
 
 def map_ir_to_source(ir_content, source_code_content):
+
+    # 使用正则表达式去除多行注释
+    source_code_content = re.sub(r'/\*.*?\*/', '', source_code_content, flags=re.DOTALL)
+    source_code_content = re.sub(r'//.*?', '', source_code_content, flags=re.DOTALL)
+    
     # 将源代码按行分割
     source_lines = source_code_content.splitlines()
     source_lines = remove_useless_char(source_lines)

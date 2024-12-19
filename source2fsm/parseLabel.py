@@ -16,10 +16,6 @@ def escape_source_code(source_code):
     source_code = source_code.replace('<', '&lt;')
     source_code = source_code.replace('>', '&gt;')
     source_code = source_code.replace('"', '\\"')
-    
-    # 使用正则表达式去除多行注释
-    source_code = re.sub(r'/\*.*?\*/', '', source_code, flags=re.DOTALL)
-    source_code = re.sub(r'//.*?', '', source_code, flags=re.DOTALL)
 
     return source_code
 
