@@ -93,7 +93,6 @@ def process_files():
 
         subprocess.run(['python3', 'main.py', 'code.c', func_name], capture_output=True, text=True)
         
-        # 处理文件并生成输出（这里是简单的拼接示例）
         output_file_path = f"output/code_{func_name}.png"
         
         response = upload_file(output_file_path, upload_url)
